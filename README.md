@@ -11,9 +11,26 @@
         psql postgres
         postgres=# CREATE DATABASE swenson;
     ``` 
-    You can use check to see if the DB was created by typing:
+    You can use check to see if the DB was created by typing.
     ```       
         postgres=# \list
     ````
+
+    For the new databse if your user does not have privileges listed in the Access Privilege column you can apply the following:
+
+    ```
+        GRANT CONNECT ON DATABASE databse TO username;
+    ```
+
+4. If you'd like to change the name of the database be sure to change the name in the `knexfile.js` on line #4 
+    ``` 
+        connection: 'postgres://localhost/swenson',
+    ```
     
 4. Next setup and seed the database in the project by running the following:
+
+
+5. To run the server locally: 
+    ```
+        npm start
+    ```
