@@ -27,10 +27,21 @@
         connection: 'postgres://localhost/swenson',
     ```
     
-4. Next setup and seed the database in the project by running the following:
+4. Next migrate and seed the database in the project by running the following:
+    ```
+        knex migrate:latest
+        knex seed:run
+    ```
+    
 
-
-5. To run the server locally: 
+5. Run the server locally: 
     ```
         npm start
     ```
+
+6. You can hit the following endpoint `localhost:8000/api/v1/recommendations` via postman with query params (machine, waterline, flavor, count, pod).
+
+    ex: localhost:8000/api/v1/recommendations?machine=espresso&flavor=vanilla&count=1&pod=espresso&waterline=true
+
+    ###### Note: 
+    If you do not wish to filter a value the query params can be empty (flavor=) but the query params must be passed in or else the server will return an error.

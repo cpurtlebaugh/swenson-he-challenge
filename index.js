@@ -12,34 +12,55 @@ app.use(bodyParser.json());
 
 // Setup Route (traditionally this would be in it's own app dir)
 app.get('/api/v1/recommendations', async (req, res, next) => {
-    console.log("req: ", req.query);
-    const podQuery = Pod.query();
-    const machineQuery =  Machine.query();
-
-    if(req.query.machine != ""){
-        machineQuery.where({"type": req.query.machine});
+    if(Object.keys(req.query).length < 5){
+        res.status(400).json("Missing query params (machine, waterline, flavor, count, pod)");
+    } else {
+        console.log("req: ", req.query);
+        const query= req.query;
+        console.log("query: ", query)
+    
+        const { machine, waterline, flavor, count, pod } = query;
+    
+        const podQuery = Pod.query();
+        const machineQuery =  Machine.query();
+    
+        if(machine !== undefined ){
+            machineQuery.where({"type": req.query.machine});
+        }
+    
+        if(waterline !== ""){
+            machineQuery.where({"waterline": req.query.waterline});
+        }
+    
+        if(flavor !== ""){
+            podQuery.where({"flavor": req.query.flavor});
+        }
+    
+        if(pod !== ""){
+            podQuery.where({"type": req.query.pod});
+        }
+    
+        if(count !== ""){
+            podQuery.where({"count": req.query.count});
+        }
+    
+        const results = await Promise.all([podQuery, machineQuery]);
+        res.json({pods: results[0], machines: results[1]});
     }
+});
 
-    if(req.query.waterline != ""){
-        machineQuery.where({"waterline": req.query.waterline});
-    }
+app.use((req, res, next) => {
+    const error = new Error('Not Found!');
+    error.status = 404;
+    next(error);
+});
 
-    if(req.query.flavor != ""){
-        podQuery.where({"flavor": req.query.flavor});
-    }
-
-    if(req.query.pod != ""){
-        podQuery.where({"type": req.query.pod});
-    }
-
-    if(req.query.count != ""){
-        podQuery.where({"count": req.query.count});
-    }
-
-    const results = await Promise.all([podQuery, machineQuery]);
-    res.json({pods: results[0], machines: results[1]});
-
-  });
+app.use((error, req, res, next) => {
+    res.status(error.status || 500)
+    res.json({error: {
+        message: error.message
+    }});
+});
 
 app.listen(port, () => {
   console.log('Swenson He E-comm Test Is Running On: ' + port);
